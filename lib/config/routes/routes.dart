@@ -1,6 +1,6 @@
 import 'package:bikepacking/home_page.dart';
 import 'package:bikepacking/main.dart';
-import 'package:bikepacking/oauth_page.dart';
+import 'package:bikepacking/features/strava/presentation/pages/oauth_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
