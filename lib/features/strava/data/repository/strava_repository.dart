@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:bikepacking/core/strava_credentials.dart';
 import 'package:bikepacking/features/strava/data/data_sources/strava_local_data_source.dart';
@@ -92,9 +93,9 @@ class StravaRepository implements IStravaRepository {
   }
   
   @override
-  downloadRoute(int id) async{
+  downloadRoute(int id, String routeName) async{
     final token = await localDataSource.getAccessToken();
-    remoteDataSource.downloadRoute(id, token);
+    return await remoteDataSource.downloadRoute(id, token);
   }
 
 }

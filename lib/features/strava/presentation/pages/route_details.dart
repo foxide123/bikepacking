@@ -19,6 +19,7 @@ class _RouteDetailsState extends State<RouteDetails> {
   PolylinePoints polylinePoints = PolylinePoints();
   List<LatLng> polylinesLatLng = [];
   late PolylineResult result;
+  String routeName = "";
 
   @override
   void initState() {
@@ -28,6 +29,9 @@ class _RouteDetailsState extends State<RouteDetails> {
     polylines.forEach((polyline) =>
         polylinesLatLng.add(LatLng(polyline.latitude, polyline.longitude)));
 
+    if(widget.object!.name! != ""){
+      routeName = widget.object!.name!;
+    }
     //getRoute();
   }
 
@@ -38,44 +42,46 @@ class _RouteDetailsState extends State<RouteDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: TopBarBackAction(),
-      body: Column(
-        children: [
-          Container(
-            height: 400,
-            width: 400,
-            child: GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target: LatLng(
-                    polylinesLatLng[0].latitude, polylinesLatLng[0].longitude),
-                zoom: 13.5,
-              ),
-              polylines: {
-                Polyline(
-                  polylineId: const PolylineId("route"),
-                  points: polylinesLatLng,
-                  width: 6,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              height: 400,
+              width: 400,
+              child: GoogleMap(
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(
+                      polylinesLatLng[0].latitude, polylinesLatLng[0].longitude),
+                  zoom: 13.5,
                 ),
-              },
+                polylines: {
+                  Polyline(
+                    polylineId: const PolylineId("route"),
+                    points: polylinesLatLng,
+                    width: 6,
+                  ),
+                },
+              ),
             ),
-          ),
-          Image.network(widget.object!.mapUrls!.url!),
-          Text(widget.object!.name!),
-          Text(widget.object!.id!.toString()),
-          Text((widget.object!.distance! / 1000).toString()),
-          ElevatedButton(
-            onPressed: () {
-              launchMapsUrl(
-                  "https://www.google.com/maps/dir/?api=1&origin=${polylinesLatLng[0].latitude},${polylinesLatLng[0].longitude}&destination=${polylinesLatLng[100].latitude},${polylinesLatLng[100].longitude}");
-            },
-            child: Text("OPEN GOOGLE MAPS"),
-          ),
-          SizedBox(height: 50),
-          ElevatedButton(
+            Image.network(widget.object!.mapUrls!.url!),
+            Text(widget.object!.name!),
+            Text(widget.object!.id!.toString()),
+            Text((widget.object!.distance! / 1000).toString()),
+            ElevatedButton(
               onPressed: () {
-                downloadRoute(widget.object!.id!);
+                launchMapsUrl(
+                    "https://www.google.com/maps/dir/?api=1&origin=${polylinesLatLng[0].latitude},${polylinesLatLng[0].longitude}&destination=${polylinesLatLng[100].latitude},${polylinesLatLng[100].longitude}");
               },
-              child: Text("DOWNLOAD"))
-        ],
+              child: Text("OPEN GOOGLE MAPS"),
+            ),
+            SizedBox(height: 50),
+            ElevatedButton(
+                onPressed: () {
+                  downloadRoute(widget.object!.id!, widget!.object!.name!);
+                },
+                child: Text("DOWNLOAD"))
+          ],
+        ),
       ),
     );
   }
@@ -88,8 +94,8 @@ class _RouteDetailsState extends State<RouteDetails> {
     }
   }
 
-  void downloadRoute(int id) {
-    BlocProvider.of<StravaBloc>(context).add(DownloadRoute(id: id));
+  void downloadRoute(int id, String routeName) {
+    BlocProvider.of<StravaBloc>(context).add(DownloadRoute(id: id, routeName: routeName));
   }
 /*
   void getRoute() async{

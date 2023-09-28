@@ -76,11 +76,15 @@ class StravaRemoteDataSource {
 
   downloadRoute(int id, String token) async{
     final response = await client.get(
-      Uri.https("www.strava.com", "/api/v3/athletes/$id/routes"),
+      Uri.https("www.strava.com", "/routes/${id}/export_gpx"),
       headers: {
         'Authorization': 'Bearer $token',
       }
     );
+    print("RESPONSE BODY: ${response.body}");
+    print(response.headers);
+    print(response.statusCode);
+    return response.body;
   }
 
   Future<Map<String, dynamic>> getTokens(String code) async {

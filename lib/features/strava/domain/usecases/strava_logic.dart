@@ -1,11 +1,16 @@
+import 'dart:io';
+
+import 'package:bikepacking/core/strava_local_notifications.dart';
 import 'package:bikepacking/features/strava/domain/enities/route.dart';
 import 'package:bikepacking/features/strava/domain/repository/i_strava_repository.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class StravaLogic{
 
   const StravaLogic(this._repository);
 
   final IStravaRepository _repository;
+
 
   Future<String> authenticateUser() async{
     if(await _repository.getExpirationDate() != "" && await _repository.getExpirationDate() != null){
@@ -76,11 +81,16 @@ class StravaLogic{
     }
   }
 
-  downloadRoute(int id) async{
+  downloadRoute(int id, String routeName) async{
     DateTime currentDateTime = DateTime.now();
       String expirationString = await _repository.getExpirationDate();
 
-    _repository.downloadRoute(id);
+    final gpxContent = await _repository.downloadRoute(id,routeName);
+
+    final File file = File("/storage/emulated/0/Download/${routeName}.gpx");
+    await file.writeAsString(gpxContent);
+
+    NotificationService().showNotification(title: 'GPX Download', body: 'Successfuly downloaded gpx file to "Downloads" folder');
   }
   
 }

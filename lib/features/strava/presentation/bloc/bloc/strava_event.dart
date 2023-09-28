@@ -42,8 +42,9 @@ class GetRoutes extends StravaEvent{
 
 class DownloadRoute extends StravaEvent{
   final int id;
+  final String routeName;
 
-  const DownloadRoute({required this.id});
+  const DownloadRoute({required this.id, required this.routeName});
 
   @override
   List<Object> get props =>[id];

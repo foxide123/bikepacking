@@ -4,5 +4,5 @@
    const stravaRedirectUri = "https://foxide123.github.io";
    const stravaResponseType = "code";
    const stravaApprovalPrompt = "force";
-   const stravaScope = "profile:read_all";
+   const stravaScope = "read_all";
 
