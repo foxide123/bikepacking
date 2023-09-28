@@ -1,8 +1,10 @@
 abstract class IStravaRepository{
   authenticate();
   exchangeCodeForTokens(String scope, String code);
+  getProfile();
+  getRoutes(int id);
+  downloadRoute(int id);
   Future<String> getAccessToken();
-  Map<String, dynamic> getTokens();
   replaceTokensOnExpiry();
   Future<String> getExpirationDate();
 }

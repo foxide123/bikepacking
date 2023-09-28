@@ -17,3 +17,21 @@ class AccessTokenRetrieved extends StravaState{
   @override
   List<Object> get props =>[token];
 }
+
+class ProfileRetrieved extends StravaState{
+  final Athlete athlete;
+
+  const ProfileRetrieved(this.athlete);
+  
+  @override
+  List<Object> get props =>[athlete];
+}
+
+class RoutesRetrieved extends StravaState{
+  final List<dynamic> routes;
+
+  const RoutesRetrieved(this.routes);
+
+  @override
+  List<Object> get props =>[];
+}

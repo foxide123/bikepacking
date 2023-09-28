@@ -1,3 +1,5 @@
+import 'package:bikepacking/features/strava/domain/enities/route.dart';
+import 'package:bikepacking/features/strava/presentation/pages/route_details.dart';
 import 'package:bikepacking/home_page.dart';
 import 'package:bikepacking/main.dart';
 import 'package:bikepacking/features/strava/presentation/pages/oauth_page.dart';
@@ -19,6 +21,13 @@ GoRouter router = GoRouter(initialLocation: "/", routes: <GoRoute>[
       builder: (BuildContext context, GoRouterState state) {
         print("IN STREETVIEW ROUTE");
         return HomePage();
+      }),
+  GoRoute(
+      path: "/routeDetails",
+      name: "routeDetails",
+      builder: (BuildContext context, GoRouterState state) {
+        RouteClass routeClass = state.extra as RouteClass;
+        return RouteDetails(object: routeClass);
       }),
 ]);
 

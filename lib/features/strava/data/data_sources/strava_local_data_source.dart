@@ -57,4 +57,14 @@ class StravaLocalDataSource{
   Future<void> cacheExpirationDate(String dateTime){
     return sharedPreferences.setString(LS_token_expiration, dateTime);
   }
+  
+  getToken(){
+    final token = sharedPreferences.getString(LS_refresh_token);
+    if(token != null){
+      return Future.value(token);
+    }else{
+      throw Exception();
+    }
+  }
+
 }

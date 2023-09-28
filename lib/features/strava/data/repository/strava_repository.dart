@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:bikepacking/core/credentials.dart';
+import 'package:bikepacking/core/strava_credentials.dart';
 import 'package:bikepacking/features/strava/data/data_sources/strava_local_data_source.dart';
 import 'package:bikepacking/features/strava/data/data_sources/strava_remote_data_source.dart';
 import 'package:bikepacking/features/strava/domain/repository/i_strava_repository.dart';
@@ -22,14 +22,15 @@ class StravaRepository implements IStravaRepository {
   }
 
   @override
-  exchangeCodeForTokens(String scope, String code) async {
+  Future<String> exchangeCodeForTokens(String scope, String code) async {
     //final code = await localDataSource.getAuthCode();
     final Map<String, dynamic> map = await remoteDataSource.getTokens(code);
     final accessToken = map['access_token'];
     final refreshToken = map['refresh_token'];
     final expiresIn = map['expires_in'];
+    final athlete = map['athlete'];
 
-    print("REPOSITORY - EXPIRES IN : $expiresIn");
+    //print("REPOSITORY - EXPIRES IN : $expiresIn");
 
     DateTime now = DateTime.now();
     DateTime tokenExpiryDateTime = now.add(Duration(seconds: expiresIn));
@@ -38,18 +39,26 @@ class StravaRepository implements IStravaRepository {
     localDataSource.cacheRefreshToken(refreshToken);
     localDataSource
         .cacheExpirationDate(tokenExpiryDateTime.toUtc().toIso8601String());
+    return accessToken;
+  }
+
+  @override
+  getProfile() async{
+    final token = await localDataSource.getAccessToken();
+    final profile = await remoteDataSource.getProfile(token); 
+    print("STRAVA_REPOSITORY: $profile");
+    return profile; 
+  }
+
+  @override
+  getRoutes(int id) async{
+    final token = await localDataSource.getAccessToken();
+    return remoteDataSource.getRoutes(id, token);
   }
 
   @override
   Future<String> getAccessToken() async{
     return await localDataSource.getAccessToken();
-  }
-
-  @override
-  Map<String, dynamic> getTokens() {
-    final accessToken = localDataSource.getAccessToken();
-    final refreshToken = localDataSource.getRefreshToken();
-    return {"access_token": accessToken, "refresh_token": refreshToken};
   }
 
   @override
@@ -80,6 +89,12 @@ class StravaRepository implements IStravaRepository {
         .cacheExpirationDate(tokenExpiryDateTime.toUtc().toIso8601String());
     
     return Future.value(newAccessToken);
+  }
+  
+  @override
+  downloadRoute(int id) async{
+    final token = await localDataSource.getAccessToken();
+    remoteDataSource.downloadRoute(id, token);
   }
 
 }
