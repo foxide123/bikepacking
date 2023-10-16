@@ -40,8 +40,18 @@ dependencies:
       url: https://github.com/foxide123/google_api_headers.git
       ref: main
   path_provider: ^2.1.1
-  permission_handler: ^11.0.0
+  permission_handler: ^10.2.0
   font_awesome_flutter: ^10.5.0
+  flutter_local_notifications: ^15.1.1
+  flutter_map: ^5.0.0
+  maplibre_gl:
+    git:
+      url: https://github.com/maplibre/flutter-maplibre-gl.git
+      ref: main
+  sensors_plus: ^4.0.0
+  flutter_compass: ^0.8.0
+  xml: ^6.3.0
+  webview_flutter: ^4.4.1
 
 dev_dependencies:
   flutter_test:
@@ -50,3 +60,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/

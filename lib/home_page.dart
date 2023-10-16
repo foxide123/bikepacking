@@ -67,6 +67,36 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   Text("ACCESS TOKEN: $token"),
+                  Center(
+                    child: ElevatedButton(
+                      child: Text("maplibre"),
+                      onPressed: (){
+                        GoRouter.of(context).push("/maplibreMap");
+                      }
+                    ),),
+                  Center(
+                    child: ElevatedButton(
+                      child: Text("HERE"),
+                      onPressed: (){
+                        GoRouter.of(context).push("/hereMap");
+                      }
+                    ),),
+                  Center(
+                    child: ElevatedButton(
+                      child: Text("GPX FILES"),
+                      onPressed: (){
+                        GoRouter.of(context).push("/deviceGpxFiles");
+                      },
+                    )
+                  ),
+                  Center(
+                    child: ElevatedButton(
+                      child: Text("Google maps to gpx"),
+                      onPressed: (){
+                        GoRouter.of(context).push("/googleMapsToGpxPage");
+                      },
+                    )
+                  )
                 ],
               )
             : Column(

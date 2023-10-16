@@ -44,4 +44,4 @@ app.*.map.json
 /android/app/release
 
 
-/lib/core/credentials.dart
+/lib/core/security/
