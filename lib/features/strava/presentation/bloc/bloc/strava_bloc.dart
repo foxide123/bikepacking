@@ -66,6 +66,12 @@ class StravaBloc extends Bloc<StravaEvent, StravaState> {
     DownloadRoute event,
     Emitter<StravaState> emit,
   )async{
-    stravaLogic.downloadRoute(event.id, event.routeName);
+    try{
+      String routeContents = await stravaLogic.downloadRoute(event.id, event.routeName);
+      emit(DownloadRouteSuccessState(routeContents));
+    }catch(e){
+      print(e);
+    }
   }
+
 }

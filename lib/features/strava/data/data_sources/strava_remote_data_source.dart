@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:bikepacking/core/strava_credentials.dart';
+import 'package:bikepacking/core/security/strava_credentials.dart';
 import 'package:bikepacking/features/strava/data/models/athlete_model.dart';
 import 'package:bikepacking/features/strava/data/models/route_model.dart';
 import 'package:bikepacking/features/strava/domain/enities/athlete.dart';
@@ -76,13 +76,13 @@ class StravaRemoteDataSource {
 
   downloadRoute(int id, String token) async{
     final response = await client.get(
-      Uri.https("www.strava.com", "/routes/${id}/export_gpx"),
+      Uri.https("www.strava.com", "/api/v3/routes/${id}/export_gpx"),
       headers: {
         'Authorization': 'Bearer $token',
       }
     );
     print("RESPONSE BODY: ${response.body}");
-    print(response.headers);
+    print("RESPONSE HEADERS: ${response.headers}");
     print(response.statusCode);
     return response.body;
   }

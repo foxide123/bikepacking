@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:bikepacking/core/local_storage_keys.dart';
+import 'package:bikepacking/core/security/local_storage_keys.dart';
 import 'package:bikepacking/features/strava/presentation/bloc/bloc/strava_bloc.dart';
 import 'package:bikepacking/features/strava/presentation/widgets/top_bar_back_action.dart';
 import 'package:flutter/material.dart';

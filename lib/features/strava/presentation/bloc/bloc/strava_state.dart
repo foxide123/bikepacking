@@ -35,3 +35,13 @@ class RoutesRetrieved extends StravaState{
   @override
   List<Object> get props =>[];
 }
+
+class DownloadRouteSuccessState extends StravaState{
+
+  final String routeContents;
+
+  const DownloadRouteSuccessState(this.routeContents);
+
+  @override
+  List<Object> get props =>[routeContents];
+}

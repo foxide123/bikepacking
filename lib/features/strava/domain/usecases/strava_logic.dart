@@ -4,93 +4,103 @@ import 'package:bikepacking/core/strava_local_notifications.dart';
 import 'package:bikepacking/features/strava/domain/enities/route.dart';
 import 'package:bikepacking/features/strava/domain/repository/i_strava_repository.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-class StravaLogic{
-
+class StravaLogic {
   const StravaLogic(this._repository);
 
   final IStravaRepository _repository;
 
-
-  Future<String> authenticateUser() async{
-    if(await _repository.getExpirationDate() != "" && await _repository.getExpirationDate() != null){
+  Future<String> authenticateUser() async {
+    if (await _repository.getExpirationDate() != "" &&
+        await _repository.getExpirationDate() != null) {
       DateTime currentDateTime = DateTime.now();
       String expirationString = await _repository.getExpirationDate();
-     // print("EXPIRATION STRING: $expirationString");
-      if(currentDateTime.isAfter(DateTime.parse(expirationString))){
+      // print("EXPIRATION STRING: $expirationString");
+      if (currentDateTime.isAfter(DateTime.parse(expirationString))) {
         return await _repository.replaceTokensOnExpiry();
-      }else{
+      } else {
         return await _repository.getAccessToken();
       }
-    }else{
-       _repository.authenticate();
+    } else {
+      _repository.authenticate();
     }
     return "";
   }
 
-  Future<String> exchangeCodeForTokens(String scope, String code) async{
-    if(await _repository.getExpirationDate() != "" && await _repository.getExpirationDate() != null){
+  Future<String> exchangeCodeForTokens(String scope, String code) async {
+    if (await _repository.getExpirationDate() != "" &&
+        await _repository.getExpirationDate() != null) {
       DateTime currentDateTime = DateTime.now();
       String expirationString = await _repository.getExpirationDate();
       //print("EXPIRATION STRING: $expirationString");
-      if(currentDateTime.isAfter(DateTime.parse(expirationString))){
+      if (currentDateTime.isAfter(DateTime.parse(expirationString))) {
         return await _repository.replaceTokensOnExpiry();
-      }else{
+      } else {
         return await _repository.getAccessToken();
       }
-    }else{
-       return _repository.exchangeCodeForTokens(scope, code);
+    } else {
+      return _repository.exchangeCodeForTokens(scope, code);
     }
   }
 
-  getProfile() async{
-    if(await _repository.getExpirationDate() != "" && await _repository.getExpirationDate() != null){
+  getProfile() async {
+    if (await _repository.getExpirationDate() != "" &&
+        await _repository.getExpirationDate() != null) {
       DateTime currentDateTime = DateTime.now();
       String expirationString = await _repository.getExpirationDate();
-      if(currentDateTime.isAfter(DateTime.parse(expirationString))){
+      if (currentDateTime.isAfter(DateTime.parse(expirationString))) {
         await _repository.replaceTokensOnExpiry();
         return await _repository.getProfile();
-      }else{
+      } else {
         final profile = await _repository.getProfile();
         print("STRAVA_LOGIC: $profile");
         return await profile;
       }
-    }else{
+    } else {
       _repository.authenticate();
     }
   }
 
-  getRoutes(int id) async{
-    if(await _repository.getExpirationDate() != "" && await _repository.getExpirationDate() != null){
+  getRoutes(int id) async {
+    if (await _repository.getExpirationDate() != "" &&
+        await _repository.getExpirationDate() != null) {
       DateTime currentDateTime = DateTime.now();
       String expirationString = await _repository.getExpirationDate();
-      if(currentDateTime.isAfter(DateTime.parse(expirationString))){
+      if (currentDateTime.isAfter(DateTime.parse(expirationString))) {
         await _repository.replaceTokensOnExpiry();
-        final profile =  await _repository.getProfile();
-        if(profile.id == 0){
+        final profile = await _repository.getProfile();
+        if (profile.id == 0) {
           _repository.authenticate();
         }
         return await _repository.getRoutes(profile.id);
-      }else{
+      } else {
         final routes = await _repository.getRoutes(id);
         return routes;
       }
-    }else{
+    } else {
       _repository.authenticate();
       return [];
     }
   }
 
-  downloadRoute(int id, String routeName) async{
+  downloadRoute(int id, String routeName) async {
     DateTime currentDateTime = DateTime.now();
-      String expirationString = await _repository.getExpirationDate();
+    String expirationString = await _repository.getExpirationDate();
 
-    final gpxContent = await _repository.downloadRoute(id,routeName);
+    final gpxContent = await _repository.downloadRoute(id, routeName);
 
-    final File file = File("/storage/emulated/0/Download/${routeName}.gpx");
-    await file.writeAsString(gpxContent);
+    if (await Permission.manageExternalStorage.isGranted) {
+      final File file = File("/storage/emulated/0/Download/${routeName}.gpx");
+      await file.writeAsString(gpxContent);
+    } else {
+      await Permission.manageExternalStorage.request();
+    }
 
-    NotificationService().showNotification(title: 'GPX Download', body: 'Successfuly downloaded gpx file to "Downloads" folder');
+    NotificationService().showNotification(
+        title: 'GPX Download',
+        body: 'Successfuly downloaded gpx file to "Downloads" folder');
+
+    return gpxContent;
   }
-  
 }

@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:bikepacking/core/strava_credentials.dart';
 import 'package:bikepacking/features/strava/data/data_sources/strava_local_data_source.dart';
 import 'package:bikepacking/features/strava/data/data_sources/strava_remote_data_source.dart';
 import 'package:bikepacking/features/strava/domain/repository/i_strava_repository.dart';

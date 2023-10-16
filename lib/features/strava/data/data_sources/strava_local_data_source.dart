@@ -1,4 +1,4 @@
-import 'package:bikepacking/core/local_storage_keys.dart';
+import 'package:bikepacking/core/security/local_storage_keys.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StravaLocalDataSource{

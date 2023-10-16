@@ -4,6 +4,7 @@ import 'package:bikepacking/features/strava/presentation/widgets/top_bar_back_ac
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -29,7 +30,7 @@ class _RouteDetailsState extends State<RouteDetails> {
     polylines.forEach((polyline) =>
         polylinesLatLng.add(LatLng(polyline.latitude, polyline.longitude)));
 
-    if(widget.object!.name! != ""){
+    if (widget.object!.name! != "") {
       routeName = widget.object!.name!;
     }
     //getRoute();
@@ -42,46 +43,64 @@ class _RouteDetailsState extends State<RouteDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: TopBarBackAction(),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              height: 400,
-              width: 400,
-              child: GoogleMap(
-                initialCameraPosition: CameraPosition(
-                  target: LatLng(
-                      polylinesLatLng[0].latitude, polylinesLatLng[0].longitude),
-                  zoom: 13.5,
-                ),
-                polylines: {
-                  Polyline(
-                    polylineId: const PolylineId("route"),
-                    points: polylinesLatLng,
-                    width: 6,
-                  ),
-                },
+      body: Column(
+        children: [
+          Container(
+            height: 300,
+            width: 300,
+            child: GoogleMap(
+              mapType: MapType.satellite,
+              initialCameraPosition: CameraPosition(
+                target: LatLng(
+                    polylinesLatLng[0].latitude, polylinesLatLng[0].longitude),
+                zoom: 13.5,
               ),
-            ),
-            Image.network(widget.object!.mapUrls!.url!),
-            Text(widget.object!.name!),
-            Text(widget.object!.id!.toString()),
-            Text((widget.object!.distance! / 1000).toString()),
-            ElevatedButton(
-              onPressed: () {
-                launchMapsUrl(
-                    "https://www.google.com/maps/dir/?api=1&origin=${polylinesLatLng[0].latitude},${polylinesLatLng[0].longitude}&destination=${polylinesLatLng[100].latitude},${polylinesLatLng[100].longitude}");
+              polylines: {
+                Polyline(
+                  polylineId: const PolylineId("route"),
+                  points: polylinesLatLng,
+                  width: 6,
+                ),
               },
-              child: Text("OPEN GOOGLE MAPS"),
             ),
-            SizedBox(height: 50),
-            ElevatedButton(
-                onPressed: () {
-                  downloadRoute(widget.object!.id!, widget!.object!.name!);
-                },
-                child: Text("DOWNLOAD"))
-          ],
-        ),
+          ),
+          Image.network(widget.object!.mapUrls!.url!),
+          Text(widget.object!.name!),
+          Text(widget.object!.id!.toString()),
+          Text((widget.object!.distance! / 1000).toString()),
+          Column(
+            children: [
+              Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      launchMapsUrl(
+                          "https://www.google.com/maps/dir/?api=1&origin=${polylinesLatLng[0].latitude},${polylinesLatLng[0].longitude}&destination=${polylinesLatLng[100].latitude},${polylinesLatLng[100].longitude}");
+                    },
+                    child: Text("OPEN GOOGLE MAPS"),
+                  ),
+                  /*ElevatedButton(
+                      onPressed: () {
+                        downloadRoute(
+                            widget.object!.id!, widget!.object!.name!);
+                      },
+                      child: Text("DOWNLOAD ROUTE")),*/
+                ],
+              ),
+              ElevatedButton(
+                  onPressed: () {
+                    GoRouter.of(context).pushNamed(
+                        "stravaOfflineMapDownloadPage",
+                        pathParameters: {
+                          'routeId': widget.object!.id.toString(),
+                          'routeName': routeName,
+                          'summaryPolyline': widget.object!.map!.summaryPolyline!
+                        });
+                  },
+                  child: Text("Download Offline map")),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -95,7 +114,8 @@ class _RouteDetailsState extends State<RouteDetails> {
   }
 
   void downloadRoute(int id, String routeName) {
-    BlocProvider.of<StravaBloc>(context).add(DownloadRoute(id: id, routeName: routeName));
+    BlocProvider.of<StravaBloc>(context)
+        .add(DownloadRoute(id: id, routeName: routeName));
   }
 /*
   void getRoute() async{
