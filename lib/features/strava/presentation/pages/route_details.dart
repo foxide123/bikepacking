@@ -53,7 +53,7 @@ class _RouteDetailsState extends State<RouteDetails> {
               initialCameraPosition: CameraPosition(
                 target: LatLng(
                     polylinesLatLng[0].latitude, polylinesLatLng[0].longitude),
-                zoom: 13.5,
+                zoom: 10,
               ),
               polylines: {
                 Polyline(

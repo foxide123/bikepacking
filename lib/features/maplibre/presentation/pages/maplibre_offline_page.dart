@@ -1,7 +1,6 @@
 import 'package:bikepacking/features/maplibre/domain/entities/offline_region_list_item.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:maplibre_gl/mapbox_gl.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 class MaplibreOfflinePage extends StatefulWidget {
   const MaplibreOfflinePage({super.key});
@@ -66,7 +65,8 @@ class _MaplibreOfflinePageState extends State<MaplibreOfflinePage> {
   }
 
   _mapStyleUrl() {
-    return "https://tiles.stadiamaps.com/styles/alidade_smooth_dark.json?api_key=5ff0622d-7374-4d5e-9e17-274be21bdac0";
+    return "https://api.maptiler.com/maps/streets/style.json?key=TsGpFIpUcx6qiUpVLjDh";
+    //return "https://tiles.stadiamaps.com/styles/alidade_smooth_dark.json?api_key=5ff0622d-7374-4d5e-9e17-274be21bdac0";
   }
 
   _updateListOfRegions() async {

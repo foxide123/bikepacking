@@ -8,7 +8,7 @@ import 'package:bikepacking/features/maplibre/presentation/bloc/maplibre_state.d
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:maplibre_gl/mapbox_gl.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:xml/xml.dart';
 
@@ -76,7 +76,7 @@ class _DeviceGpxFilesPageState extends State<DeviceGpxFilesPage> {
     }
     _downloadOfflineRegion();
   }
-/*
+
   Future<List<LatLng>> extractCoordinatesFromGPX(File gpxFile) async {
   final document = XmlDocument.parse(await gpxFile.readAsString());
   final trkpts = document.findAllElements('trkpt');
@@ -87,7 +87,7 @@ class _DeviceGpxFilesPageState extends State<DeviceGpxFilesPage> {
     return LatLng(lat, lon);
   }).toList();
 }
-*/
+
 
   _downloadOfflineRegion() async {
     Map<String, double> coordinates = await extractBounds(content!);

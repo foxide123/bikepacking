@@ -1,7 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:maplibre_gl/mapbox_gl.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 final bounds = LatLngBounds(
   southwest: const LatLng(40.69, -74.03),
@@ -25,15 +24,16 @@ class MaplibreMapPage extends StatefulWidget {
 }
 
 class _MaplibreMapPageState extends State<MaplibreMapPage> {
-  String styleUrl = "https://tiles.stadiamaps.com/styles/outdoors.json";
-  String apiKey = "5ff0622d-7374-4d5e-9e17-274be21bdac0";
+  String styleUrl = "https://api.maptiler.com/maps/streets/style.json?key=TsGpFIpUcx6qiUpVLjDh";//"https://tiles.stadiamaps.com/styles/outdoors.json";
+ // String apiKey = "5ff0622d-7374-4d5e-9e17-274be21bdac0";
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         MaplibreMap(
-          styleString: "$styleUrl?api_key=$apiKey",
+          styleString: styleUrl,
+//styleString: "$styleUrl?api_key=$apiKey",
           myLocationEnabled: true,
           initialCameraPosition:
               const CameraPosition(target: LatLng(55.869312, 9.888437), zoom: 10),

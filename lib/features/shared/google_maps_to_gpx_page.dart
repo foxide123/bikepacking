@@ -1,4 +1,8 @@
+import 'package:bikepacking/core/coordinates_to_gpx.dart';
+import 'package:bikepacking/features/google_maps/domain/entities/routing_dto.dart';
+import 'package:bikepacking/features/google_maps/presentation/bloc/bloc/google_maps_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -48,7 +52,7 @@ class _GoogleMapsToGpxPageState extends State<GoogleMapsToGpxPage> {
     super.initState();
   }
 
-  Map<String,dynamic> extractCoordinates(String url) {
+  RoutingDto extractCoordinates(String url) {
     String startLat = '';
     String startLon = '';
     String endLat = '';
@@ -63,7 +67,7 @@ class _GoogleMapsToGpxPageState extends State<GoogleMapsToGpxPage> {
 
     if (fallbackMatch == null) {
       print("FALLBACKMATCH EMPTY");
-      return {};
+      return RoutingDto.empty();
     }
 
     final fallbackUrl = Uri.decodeFull(fallbackMatch.group(1)!);
@@ -85,7 +89,7 @@ class _GoogleMapsToGpxPageState extends State<GoogleMapsToGpxPage> {
         RegExp(r'!\d+d([\d.-]+)[^!]+!\d+d([\d.-]+)').allMatches(fallbackUrl);
 
     if (coordsMatch.isNotEmpty) {
-      for (int i=0; i<coordsMatch.length; i++) {
+      for (int i = 0; i < coordsMatch.length; i++) {
         final lat = coordsMatch.elementAt(i).group(1);
         final lon = coordsMatch.elementAt(i).group(2);
         if (coordsMatch.length == 2) {
@@ -102,6 +106,12 @@ class _GoogleMapsToGpxPageState extends State<GoogleMapsToGpxPage> {
             endLon = lon.toString();
           }
         }
+        if (coordsMatch.length == 1) {
+          startLat = initialCoordsMatch!.group(1)!;
+          startLon = initialCoordsMatch!.group(2)!;
+          endLat = lat.toString();
+          endLon = lon.toString();
+        }
       }
     } else {
       print("Coordinates Match Failed");
@@ -109,12 +119,22 @@ class _GoogleMapsToGpxPageState extends State<GoogleMapsToGpxPage> {
 
     if (url.contains('!5i1')) {
       alternative = '1';
-    }else if (url.contains('!5i2')) {
+    } else if (url.contains('!5i2')) {
       alternative = '2';
-    }else{
+    } else {
       alternative = '';
     }
-    return {'start_lat': startLat, 'start_lon': startLon, 'end_lat': endLat, 'end_lon': endLon, 'alternative': alternative};
+    getRouting(startLat, startLon, endLat, endLon, alternative);
+    print("StartLat: $startLat");
+    print("StartLon: $startLon");
+    print("EndLat: $endLat");
+    print("EndLon: $endLon");
+    return RoutingDto(
+        startLat: startLat,
+        startLon: startLon,
+        endLat: endLat,
+        endLon: endLon,
+        alternative: alternative);
   }
 
   String? getGpx(String text) {
@@ -129,40 +149,45 @@ class _GoogleMapsToGpxPageState extends State<GoogleMapsToGpxPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Column(
-        children: [
-          Text("Paste the google maps link"),
-          TextField(
-            controller: myController,
-          ),
-          ElevatedButton(
-              onPressed: () {
-                String url = getGpx(myController.text) ?? '';
-                print("URL: $url");
-                webViewController?.loadRequest(Uri.parse(url));
-              },
-              child: Text("Get gpx from Google Maps")),
-          SizedBox(
-              width: 0.0,
-              height: 0.0,
-              child: WebViewWidget(controller: webViewController!)
-              /*WebView(
-    initialUrl: extractedURL,
-    onWebViewCreated: (WebViewController webViewController) {
-      // You can interact with the WebView using the controller
-    },
-    javascriptMode: JavascriptMode.unrestricted,
-    onPageFinished: (String url) {
-      // Process the page content after it's loaded
-    },
-    navigationDelegate: (NavigationRequest request) {
-      // Handle navigation requests, if needed
-      return NavigationDecision.navigate;
-    },
-  )*/
+      body: BlocConsumer<GoogleMapsBloc, GoogleMapsState>(
+        listener: (context, state) {
+          if(state is RoutingRetrieved){
+            CoordinatesToGpx.convertWaypointsToGPX(state.responseList);
+          }
+        },
+        builder: (context, state) {
+          return Column(
+            children: [
+              Text("Paste the google maps link"),
+              TextField(
+                controller: myController,
+              ),
+              ElevatedButton(
+                  onPressed: () {
+                    String url = getGpx(myController.text) ?? '';
+                    print("URL: $url");
+                    webViewController?.loadRequest(Uri.parse(url));
+                  },
+                  child: Text("Get gpx from Google Maps")),
+              SizedBox(
+                width: 0.0,
+                height: 0.0,
+                child: WebViewWidget(controller: webViewController!),
               )
-        ],
+            ],
+          );
+        },
       ),
     );
+  }
+
+  void getRouting(String startLat, String startLon, String endLat,
+      String endLon, String alternative) {
+    BlocProvider.of<GoogleMapsBloc>(context).add(GetRouting(
+        startLat: startLat,
+        startLon: startLon,
+        endLat: endLat,
+        endLon: endLon,
+        alternative: alternative));
   }
 }

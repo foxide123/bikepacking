@@ -1,5 +1,5 @@
 import 'package:bikepacking/features/maplibre/data/repository/maplibre_repository.dart';
-import 'package:maplibre_gl/mapbox_gl.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 typedef DownloadEventCallback = void Function(DownloadRegionStatus status);
 
@@ -13,7 +13,7 @@ class MaplibreLogic{
       bounds: LatLngBounds(southwest: LatLng(minLat, minLon), northeast: LatLng(maxLat, maxLon)),
       mapStyleUrl: "https://tiles.stadiamaps.com/styles/alidade_smooth_dark.json?api_key=5ff0622d-7374-4d5e-9e17-274be21bdac0", 
       minZoom: 6, 
-      maxZoom: 14);
+      maxZoom: 10);
     final region = await downloadOfflineRegion(offlineRegionDefinition,
         metadata: {
           'name': routeName,

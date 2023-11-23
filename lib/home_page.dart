@@ -76,13 +76,6 @@ class _HomePageState extends State<HomePage> {
                     ),),
                   Center(
                     child: ElevatedButton(
-                      child: Text("HERE"),
-                      onPressed: (){
-                        GoRouter.of(context).push("/hereMap");
-                      }
-                    ),),
-                  Center(
-                    child: ElevatedButton(
                       child: Text("GPX FILES"),
                       onPressed: (){
                         GoRouter.of(context).push("/deviceGpxFiles");

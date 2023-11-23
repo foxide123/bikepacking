@@ -1,5 +1,4 @@
 
-import 'package:bikepacking/features/mapbox/presentation/pages/mapbox_page.dart';
 import 'package:bikepacking/features/maplibre/presentation/pages/maplibre_map_page.dart';
 import 'package:bikepacking/features/maplibre/presentation/pages/maplibre_offline_page.dart';
 import 'package:bikepacking/features/maplibre/presentation/pages/maplibre_offline_region_map.dart';
@@ -84,11 +83,6 @@ GoRouter router = GoRouter(initialLocation: "/", routes: <GoRoute>[
             routeName: routeName,
             summaryPolyline: summaryPolyline,
             gpxContent: gpxContent);
-      }),
-  GoRoute(
-      path: "/mapbox",
-      builder: (BuildContext context, GoRouterState state) {
-        return MapBoxPage();
       }),
   GoRoute(
       path: "/deviceGpxFiles",

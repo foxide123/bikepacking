@@ -10,7 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:maplibre_gl/mapbox_gl.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:path_provider/path_provider.dart';
 
 final fakeOfflineRegion = OfflineRegion(
@@ -115,9 +115,9 @@ class _StravaOfflineMapDownloadPageState
       minLon = coordinates['minLon']!;
       maxLon = coordinates['maxLon']!;
 
-    List<OfflineRegion> offlineRegions = await getListOfRegions();
+     List<OfflineRegion> offlineRegions = await getListOfRegions();
     final offlineRegion = offlineRegions.firstWhere(
-        (offlineRegion) => offlineRegion.metadata['name'] == widget.routeName,
+       (offlineRegion) => offlineRegion.metadata['name'] == widget.routeName,
         orElse: () => fakeOfflineRegion);
     if (offlineRegion.id == -1) {
       print("OFFLINE REGION IS -1");
@@ -143,5 +143,6 @@ class _StravaOfflineMapDownloadPageState
             'summaryPolyline': widget.summaryPolyline,
           });
     }
+    
   }
 }

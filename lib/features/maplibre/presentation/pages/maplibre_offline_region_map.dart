@@ -1,5 +1,3 @@
-import 'dart:async';
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:bikepacking/features/maplibre/domain/entities/offline_region_list_item.dart';
@@ -7,9 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:maplibre_gl/mapbox_gl.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:sensors_plus/sensors_plus.dart';
 import 'package:xml/xml.dart';
 
 class MaplibreOfflineRegionMap extends StatefulWidget {
@@ -61,9 +58,10 @@ class _MaplibreOfflineRegionMapState extends State<MaplibreOfflineRegionMap> {
               northeast: LatLng(
                   double.parse(widget.maxLat), double.parse(widget.maxLon))),
           mapStyleUrl:
-              'https://tiles.stadiamaps.com/styles/outdoors.json?api_key=5ff0622d-7374-4d5e-9e17-274be21bdac0',
+              //'https://tiles.stadiamaps.com/styles/outdoors.json?api_key=5ff0622d-7374-4d5e-9e17-274be21bdac0',
+          'https://api.maptiler.com/maps/streets/style.json?key=TsGpFIpUcx6qiUpVLjDh',
           minZoom: 10,
-          maxZoom: 18),
+          maxZoom: 16),
       name: widget.routeName,
       estimatedTiles: 0,
     );
@@ -157,7 +155,7 @@ class _MaplibreOfflineRegionMapState extends State<MaplibreOfflineRegionMap> {
       CameraUpdate.newCameraPosition(
         CameraPosition(
           target: polylinesLatLng[0], // maintain current target/center
-          zoom: 16, // maintain current zoom
+          zoom: 10, // maintain current zoom
           bearing: adjustedRotation+180, // set bearing to the direction the marker is facing
         ),
       ),
