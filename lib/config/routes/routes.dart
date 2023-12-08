@@ -1,4 +1,6 @@
-
+import 'package:bikepacking/features/bikepacking/presentation/pages/bikepacking_list_page.dart';
+import 'package:bikepacking/features/bikepacking/presentation/pages/bikepacking_page.dart';
+import 'package:bikepacking/features/bikepacking/presentation/pages/currency_converter_page.dart';
 import 'package:bikepacking/features/maplibre/presentation/pages/maplibre_map_page.dart';
 import 'package:bikepacking/features/maplibre/presentation/pages/maplibre_offline_page.dart';
 import 'package:bikepacking/features/maplibre/presentation/pages/maplibre_offline_region_map.dart';
@@ -93,6 +95,21 @@ GoRouter router = GoRouter(initialLocation: "/", routes: <GoRoute>[
       path: "/googleMapsToGpxPage",
       builder: (BuildContext context, GoRouterState state) {
         return GoogleMapsToGpxPage();
+      }),
+  GoRoute(
+      path: "/bikepackingPage",
+      builder: (BuildContext context, GoRouterState state) {
+        return BikepackingPage();
+      }),
+  GoRoute(
+      path: "/bikepackingListPage",
+      builder: (BuildContext context, GoRouterState state) {
+        return BikepackingListPage();
+      }),
+  GoRoute(
+      path: "/currencyConverterPage",
+      builder: (BuildContext context, GoRouterState state) {
+        return CurrencyConverterPage();
       })
 ]);
 
