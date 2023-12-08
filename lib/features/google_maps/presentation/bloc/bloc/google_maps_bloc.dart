@@ -1,4 +1,5 @@
 import 'package:bikepacking/features/google_maps/domain/entities/coordinates_class.dart';
+import 'package:bikepacking/features/google_maps/domain/entities/elevation_class.dart';
 import 'package:bikepacking/features/google_maps/domain/usecases/google_maps_logic.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -11,6 +12,7 @@ class GoogleMapsBloc extends Bloc<GoogleMapsEvent, GoogleMapsState> {
   GoogleMapsBloc({required this.googleMapsLogic}) : super(GoogleMapsInitial()) {
     on<GoogleMapsEvent>((event, emit) {});
     on<GetRouting>(_onGetRouting);
+    on<GetElevation>(_onGetElevation);
   }
 
   void _onGetRouting(
@@ -18,8 +20,19 @@ class GoogleMapsBloc extends Bloc<GoogleMapsEvent, GoogleMapsState> {
     Emitter<GoogleMapsState> emit,
   ) async {
     final response = await googleMapsLogic.getRouting(event.startLat, event.startLon, event.endLat, event.endLon);
-    if(response != ""){
-      emit(RoutingRetrieved(response));
-    }
+    response.fold(
+      ifLeft: (value) => print(value),
+      ifRight: (listOfCoordinates) => emit(RoutingRetrieved(listOfCoordinates))
+    );
+  }
+
+  void _onGetElevation(
+    GetElevation event,
+    Emitter<GoogleMapsState> emit,
+  ) async {
+    final response = await googleMapsLogic.getElevation(event.encodedPolylines);
+    response.fold(
+      ifLeft: (value)=>print(value),
+      ifRight: (listOfElevation)=> emit(ElevationRetrieved(listOfElevation)));
   }
 }

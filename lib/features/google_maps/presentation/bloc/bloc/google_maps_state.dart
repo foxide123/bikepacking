@@ -24,3 +24,9 @@ class RoutingRetrieved extends GoogleMapsState{
 
   const RoutingRetrieved(this.responseList);
 }
+
+class ElevationRetrieved extends GoogleMapsState{
+  final List<ElevationClass> elevationList;
+
+  const ElevationRetrieved(this.elevationList);
+}

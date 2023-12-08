@@ -19,3 +19,12 @@ class GetRouting extends GoogleMapsEvent {
   @override
   List<Object> get props => [startLat, startLon, endLat, endLon];
 }
+
+class GetElevation extends GoogleMapsEvent{
+  final String encodedPolylines;
+
+  const GetElevation({required this.encodedPolylines});
+
+  @override
+  List<Object> get props => [encodedPolylines];
+}
