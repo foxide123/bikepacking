@@ -2,6 +2,7 @@ import 'package:bikepacking/features/strava/domain/enities/athlete.dart';
 import 'package:bikepacking/features/strava/domain/enities/route.dart';
 import 'package:bikepacking/features/strava/presentation/bloc/bloc/strava_bloc.dart';
 import 'package:bikepacking/features/strava/presentation/widgets/top_bar_back_action.dart';
+import 'package:bikepacking/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -54,77 +55,196 @@ class _HomePageState extends State<HomePage> {
         }
       },
       child: Scaffold(
-        appBar: TopBarBackAction(),
-        body: athleteId == 0
-            ? Column(
-                children: [
-                  Center(
-                    child: ElevatedButton(
-                      child: Text("AUTHENTICATE"),
-                      onPressed: () {
-                        authenticate(context);
-                      },
-                    ),
-                  ),
-                  Text("ACCESS TOKEN: $token"),
-                  Center(
-                    child: ElevatedButton(
-                      child: Text("maplibre"),
-                      onPressed: (){
-                        GoRouter.of(context).push("/maplibreMap");
-                      }
-                    ),),
-                  Center(
-                    child: ElevatedButton(
-                      child: Text("GPX FILES"),
-                      onPressed: (){
-                        GoRouter.of(context).push("/deviceGpxFiles");
-                      },
-                    )
-                  ),
-                  Center(
-                    child: ElevatedButton(
-                      child: Text("Google maps to gpx"),
-                      onPressed: (){
-                        GoRouter.of(context).push("/googleMapsToGpxPage");
-                      },
-                    )
-                  )
-                ],
-              )
-            : Column(
-                children: [
-                  Text("ID: ${athleteId}"),
-                  Text("Username: ${athlete.username}"),
-                  Image.network(athlete.profile!),
-                  routes.isEmpty
-                      ? Text("ROUTES ARE NULL")
-                      : Expanded(
-                          child: ListView.builder(
-                            itemBuilder: (BuildContext context, int index) {
-                              return GestureDetector(
-                                onTap: () {
-                                  GoRouter.of(context).pushNamed("routeDetails", extra:routes[index]);
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Image.network(routes[index].mapUrls.url),
-                                      Text(routes[index].name),
-                                    ],
-                                  ),
+          body: Column(
+        children: [
+          Expanded(
+            child: Stack(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage('assets/wallpaper.png'),
+                          fit: BoxFit.fitWidth)),
+                ),
+                Positioned(top: 50,
+                 left: 80, 
+                child: Image.asset('assets/bikepacker.png'), height: 200,)
+              ],
+            ),
+          ),
+          athleteId == 0
+              ? Container(
+                  color: Color(0xffd5be97),
+                  height: 350,
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                            child: Container(
+                              width: MediaQuery.of(context).size.width / 2,
+                              height: 175,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Color(0x00BA704F), // ARGB with 0% opacity
+                                    Color(0xFFBA704F), // ARGB with 100% opacity
+                                  ],
                                 ),
-                              );
-                            },
-                            itemCount: routes.length,
+                              ),
+                              child: Column(
+                                children: [
+                                  Text(""),
+                                  // Text("AUTHENTICATE"),
+                                  Image.asset("assets/map_retro.png",
+                                      height: 150)
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                ],
-              ),
-      ),
+                          /* GestureDetector(
+                            child: Container(
+                              width: MediaQuery.of(context).size.width/2,
+                              height: 175,
+                              decoration: BoxDecoration(color: Color(0xffBA704F)),
+                              child: Column(
+                                children: [
+                                  Text("AUTHENTICATE")
+                                ],
+                              ),
+                            ),
+                            onTap: ()=>authenticate(context),
+                          ),*/
+                          
+                          GestureDetector(
+                            child: Container(
+                              width: MediaQuery.of(context).size.width / 2,
+                              height: 175,
+                              decoration:
+                                  BoxDecoration( gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Color(0x00BA704F), // ARGB with 0% opacity
+                                    Color(0xff975a28), // ARGB with 100% opacity
+                                  ],
+                                ),),
+                              child: Column(
+                                children: [
+                                  Text(""),
+                                  // Text("bikepacking"),
+                                  //Text("maplibre"),
+                                  Image.asset("assets/bikepacking.png",
+                                      height: 150)
+                                  //Image.asset('assets/map_retro.png', height: 150),
+                                ],
+                              ),
+                            ),
+
+                            onTap: ()=>GoRouter.of(context).push("/bikepackingPage"),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          
+                          GestureDetector(
+                            child: Container(
+                                width: MediaQuery.of(context).size.width / 2,
+                                height: 175,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Color(0x00E48F45), 
+                                    Color(0xffE48F45), 
+                                  ],
+                                ),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Text(""),
+                                    //  Text("GPX FILES"),
+                                    Image.asset('assets/files_retro.png',
+                                        height: 140),
+                                  ],
+                                )),
+                            onTap: () =>
+                                GoRouter.of(context).push("/deviceGpxFiles"),
+                          ),
+                          
+                          GestureDetector(
+                            child: Container(
+                                width: MediaQuery.of(context).size.width / 2,
+                                height: 175,
+                                decoration:
+                                    BoxDecoration(gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Color(0x00F5CCA0), 
+                                    Color(0xffF5CCA0), 
+                                  ],
+                                ),),
+                                child: Column(
+                                  children: [
+                                    Text(""),
+                                    // Text("Google maps to gpx"),
+                                    Image.asset(
+                                        'assets/google_maps_converter.png',
+                                        height: 140),
+                                  ],
+                                )),
+                            onTap: () => GoRouter.of(context)
+                                .push("/googleMapsToGpxPage"),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                )
+              : Column(
+                  children: [
+                    Text("ID: ${athleteId}"),
+                    Text("Username: ${athlete.username}"),
+                    Image.network(athlete.profile!),
+                    routes.isEmpty
+                        ? Text("ROUTES ARE NULL")
+                        : Expanded(
+                            child: ListView.builder(
+                              itemBuilder: (BuildContext context, int index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    GoRouter.of(context).pushNamed(
+                                        "routeDetails",
+                                        extra: routes[index]);
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Image.network(
+                                            routes[index].mapUrls.url),
+                                        Text(routes[index].name),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                              itemCount: routes.length,
+                            ),
+                          ),
+                  ],
+                ),
+        ],
+      )),
     );
   }
 
