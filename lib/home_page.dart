@@ -68,7 +68,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Positioned(top: 50,
                  left: 80, 
-                child: Image.asset('assets/bikepacker.png'), height: 200,)
+                child: Image.asset('assets/logo.png'), height: 180,)
               ],
             ),
           ),
