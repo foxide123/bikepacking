@@ -1,21 +1,31 @@
+import 'dart:async';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:bikepacking/core/gpx_distance_calculator.dart';
-import 'package:bikepacking/core/polyline_encoder.dart';
+import 'package:bikepacking/core/create_offline_region.dart';
+import 'package:bikepacking/core/gpx/gpx_to_coordinates.dart';
+import 'package:bikepacking/core/gpx/gpx_distance_calculator.dart';
+import 'package:bikepacking/core/gpx/gpx_to_coordinates.dart';
+import 'package:bikepacking/core/gpx/polyline_encoder.dart';
 import 'package:bikepacking/features/google_maps/domain/entities/chart_data.dart';
 import 'package:bikepacking/features/google_maps/domain/entities/elevation_class.dart';
 import 'package:bikepacking/features/google_maps/presentation/bloc/bloc/google_maps_bloc.dart';
 import 'package:bikepacking/features/maplibre/domain/entities/offline_region_list_item.dart';
+import 'package:bikepacking/features/maplibre/presentation/helper_functions/offline_region_map/add_polyline_to_map.dart';
+import 'package:bikepacking/features/maplibre/presentation/helper_functions/offline_region_map/adjust_map_rotation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:xml/xml.dart';
+import 'package:geolocator_platform_interface/src/models/position.dart'
+    as Geolocation_Position;
 
 class MaplibreOfflineRegionMap extends StatefulWidget {
   final String regionId;
@@ -63,25 +73,17 @@ class _MaplibreOfflineRegionMapState extends State<MaplibreOfflineRegionMap> {
 
   ChartSeriesController? _chartSeriesController;
 
+  bool canUserRotateMap = true;
+
+  StreamSubscription<CompassEvent>? compassSubscription;
+  StreamSubscription<Geolocation_Position.Position>? speedSubscription;
+
+  bool hideBottomPart = false;
+
   @override
   void initState() {
-    item = OfflineRegionListItem(
-      downloadedId: int.parse(widget.regionId),
-      isDownloading: false,
-      offlineRegionDefinition: OfflineRegionDefinition(
-          bounds: LatLngBounds(
-              southwest: LatLng(
-                  double.parse(widget.minLat), double.parse(widget.minLon)),
-              northeast: LatLng(
-                  double.parse(widget.maxLat), double.parse(widget.maxLon))),
-          mapStyleUrl:
-              //'https://tiles.stadiamaps.com/styles/outdoors.json?api_key=5ff0622d-7374-4d5e-9e17-274be21bdac0',
-              'https://api.maptiler.com/maps/streets/style.json?key=TsGpFIpUcx6qiUpVLjDh',
-          minZoom: 10,
-          maxZoom: 16),
-      name: widget.routeName,
-      estimatedTiles: 0,
-    );
+    item = createOfflineRegionListItem(widget.regionId, widget.minLat,
+        widget.maxLat, widget.minLon, widget.maxLon, widget.routeName);
 
     _fetchPermissionStatus();
 
@@ -103,9 +105,22 @@ class _MaplibreOfflineRegionMapState extends State<MaplibreOfflineRegionMap> {
       //enablePinching: true,
       //zoomMode: ZoomMode.y,
     );
-
     super.initState();
   }
+
+  @override
+  void dispose() {
+    //mapController?.dispose();
+    compassSubscription?.cancel();
+    super.dispose();
+  }
+
+  /*void calculateSpeed() {
+    speedSubscription = Geolocator.getPositionStream().listen((position) {
+      var speedInMps = position.speed.toStringAsPrecision(2);
+      print(speedInMps);
+    });
+  }*/
 
   void _fetchPermissionStatus() {
     Permission.locationWhenInUse.status.then((status) {
@@ -132,28 +147,8 @@ class _MaplibreOfflineRegionMapState extends State<MaplibreOfflineRegionMap> {
 
   void addPolyline() async {
     try {
-      if (mapController != null && polylinesLatLng.isNotEmpty) {
-        mapController?.addLine(
-          LineOptions(
-            geometry: polylinesLatLng,
-            lineColor: "#ff0000",
-            lineWidth: 5.0,
-            lineOpacity: 0.5,
-          ),
-        );
-        List<Symbol>? symbols = await mapController?.addSymbols([
-          SymbolOptions(
-            geometry: polylinesLatLng[0],
-            iconImage: 'arrow-icon',
-            iconSize: 0.2,
-          ),
-          SymbolOptions(
-            geometry: polylinesLatLng[polylinesLatLng.length - 1],
-            iconImage: 'flag-checkered',
-            iconSize: 0.2,
-          )
-        ]);
-        addedSymbol = symbols![0];
+      if (mapController != null && polylinesLatLng.isNotEmpty && mounted) {
+        addedSymbol = await addPolylineToMap(mapController!, polylinesLatLng);
       }
 
       updateMarkerPosition();
@@ -162,80 +157,45 @@ class _MaplibreOfflineRegionMapState extends State<MaplibreOfflineRegionMap> {
     }
   }
 
-  void adjustMapRotation(double? direction) {
-    if (mapController != null && direction != null) {
-      double mapBearing = mapController!.cameraPosition!.bearing;
-      double adjustedRotation = direction - mapBearing;
-
-      // Adjust to keep the value between 0 to 360
-      if (adjustedRotation >= 360) {
-        adjustedRotation -= 360;
-      } else if (adjustedRotation < 0) {
-        adjustedRotation += 360;
-      }
-
-      mapController?.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(
-            target: polylinesLatLng[0], // maintain current target/center
-            zoom: 10, // maintain current zoom
-            bearing: adjustedRotation +
-                180, // set bearing to the direction the marker is facing
-          ),
-        ),
-      );
-    } else {
-      print("adjustMapRotation - null");
-    }
-  }
-
   void extractCoordinatesFromGPX() async {
-    final document = XmlDocument.parse(widget.gpxContent!);
-    final trkpts = document.findAllElements('trkpt');
-
-    polylinesLatLng = trkpts.map((trkpt) {
-      final lat = double.parse(trkpt.getAttribute('lat')!);
-      final lon = double.parse(trkpt.getAttribute('lon')!);
-      return LatLng(lat, lon);
-    }).toList();
+    polylinesLatLng = gpxToCoordinates(widget.gpxContent!);
 
     setState(() {
-      distance = trackDistance(polylinesLatLng);
+      distance = calculateGpxDistance(polylinesLatLng);
     });
-    // Split the list into chunks of 500 and encode each chunk.
+
     String encodedPolyline = '';
     if (polylinesLatLng.length > 500) {
       List<LatLng> tempList = [];
+      List<LatLng> tempList2 = [];
       for (int i = 0; i < polylinesLatLng.length; i++) {
         if (i == 0) tempList.add(polylinesLatLng[i]);
-        if (i == polylinesLatLng.length - 1) {
-          tempList.add(polylinesLatLng[i - 1]);
+        if (i >= polylinesLatLng.length - 2) {
+          tempList.add(polylinesLatLng[i]);
           continue;
         }
         if (i % 50 == 0) {
           tempList.add(polylinesLatLng[i]);
         }
       }
-      encodedPolyline = encodePolyline(tempList);
-      /* int numOfChunks = (polylinesLatLng.length / 500).ceil();
-      for (int i = 0; i < numOfChunks; i++) {
-        // Calculate the start and end indices for the sublist
-        int start = 500 * i;
-        int end = min(
-            start + 500,
-            polylinesLatLng
-                .length); // Ensure we don't go past the end of the list
-        // Encode the chunk and add it to the list of encoded polylines
-        encodedPolylines
-            .add(encodePolyline(polylinesLatLng.sublist(start, end)));
-      }*/
+      if (tempList.length > 500) {
+        for (int i = 0; i < tempList.length; i++) {
+          if (i == 0) tempList2.add(tempList[i]);
+          if (i % 10 == 0) {
+            tempList2.add(tempList[i]);
+          }
+        }
+      }
+      if (tempList2.isNotEmpty) {
+        encodedPolyline = encodePolyline(tempList2);
+      } else {
+        encodedPolyline = encodePolyline(tempList);
+      }
     } else {
-      // If the list is smaller than 500, just encode the entire list
       encodedPolyline = encodePolyline(polylinesLatLng);
     }
 
-      getElevation(
-          encodedPolyline); // getElevation should accept a List<String>
+    getElevation(encodedPolyline);
   }
 
   List<double> calculateDistances(List<ElevationClass> elevationData) {
@@ -253,7 +213,7 @@ class _MaplibreOfflineRegionMapState extends State<MaplibreOfflineRegionMap> {
     }
     for (int i = 0; i < elevationData.length; i++) {
       setState(() {
-         chartData.add(ChartData(
+        chartData.add(ChartData(
             distance: distances[i], elevation: elevationData[i].elevation));
       });
     }
@@ -262,7 +222,7 @@ class _MaplibreOfflineRegionMapState extends State<MaplibreOfflineRegionMap> {
   }
 
   void updateMarkerPosition() {
-    FlutterCompass.events!.listen((CompassEvent event) {
+    compassSubscription = FlutterCompass.events!.listen((CompassEvent event) {
       print(event.heading);
       event.headingForCameraMode;
       compassDirection = event.heading;
@@ -270,11 +230,15 @@ class _MaplibreOfflineRegionMapState extends State<MaplibreOfflineRegionMap> {
     });
   }
 
-  void _onMapCreated(MaplibreMapController controller) async {
-    setState(() {
-      mapController = controller;
-    });
+  void _onMapCreated(MaplibreMapController controller) {
+    if (mounted) {
+      setState(() {
+        mapController = controller;
+      });
+    }
+  }
 
+  void _onStyleLoaded() async {
     ByteData byteData = await rootBundle.load("assets/up-long-solid.png");
     ByteData byteDataFinishLine =
         await rootBundle.load("assets/flag-checkered-solid.png");
@@ -289,10 +253,13 @@ class _MaplibreOfflineRegionMapState extends State<MaplibreOfflineRegionMap> {
     return direction >= 0 ? direction : 360 + direction;
   }
 
-  void updateMarkerDirection(double? direction) {
-    if (mapController != null && direction != null && addedSymbol != null) {
+  void updateMarkerDirection(double? compassDirection) {
+    if (mapController != null &&
+        compassDirection != null &&
+        addedSymbol != null &&
+        mounted) {
       double mapBearing = mapController!.cameraPosition!.bearing;
-      double adjustedRotation = direction - mapBearing;
+      double adjustedRotation = compassDirection - mapBearing;
 
       // Adjust to keep the value between 0 to 360
       if (adjustedRotation >= 360) {
@@ -300,7 +267,9 @@ class _MaplibreOfflineRegionMapState extends State<MaplibreOfflineRegionMap> {
       } else if (adjustedRotation < 0) {
         adjustedRotation += 360;
       }
-
+      if (!canUserRotateMap) {
+        adjustMapRotation(compassDirection, mapController!, polylinesLatLng);
+      }
       mapController?.updateSymbol(
         addedSymbol,
         SymbolOptions(
@@ -330,14 +299,18 @@ class _MaplibreOfflineRegionMapState extends State<MaplibreOfflineRegionMap> {
         body: Stack(
           children: [
             MaplibreMap(
+              // onMapClick: (point, coordinates) => ,
               trackCameraPosition: true,
               myLocationEnabled: true,
+              onStyleLoadedCallback: _onStyleLoaded,
               onCameraIdle: () async {
                 print("on camera idle");
                 if (mapController != null) {
                   print('mapController is not null');
                 }
-                if (mapController?.cameraPosition != null) {
+                if (mapController?.cameraPosition != null &&
+                    mapController != null &&
+                    mounted) {
                   print(
                       'Camera Position after camera movement stops: ${mapController!.cameraPosition!.bearing}');
                 } else {
@@ -367,26 +340,113 @@ class _MaplibreOfflineRegionMapState extends State<MaplibreOfflineRegionMap> {
                       addPolyline();
                     },
                     child: Text("Add polyline")),
-                ElevatedButton(
+                FloatingActionButton.extended(
+                    backgroundColor:
+                        canUserRotateMap ? Colors.blue : Colors.orange,
+                    label: Text(
+                      "Auto Center",
+                      textAlign: TextAlign.center,
+                    ),
                     onPressed: () {
-                      adjustMapRotation(mapController!.cameraPosition!.bearing);
+                      setState(() {
+                        canUserRotateMap = !canUserRotateMap;
+                      });
+                      if (mapController != null && mounted) {
+                        adjustMapRotation(
+                            mapController!.cameraPosition!.bearing,
+                            mapController!,
+                            polylinesLatLng);
+                      }
                     },
-                    child: Text("Center"))
+                    elevation: canUserRotateMap ? 6.0 : 18.0),
+                /* ElevatedButton(
+                    onPressed: () {
+                      canUserRotateMap = !canUserRotateMap;
+                      adjustMapRotation(mapController!.cameraPosition!.bearing, mapController!, polylinesLatLng);
+                    },
+                    child: Text("Auto Center"))*/
               ],
+            ),
+            Positioned(
+              top: 20,
+              right: 10,
+              child: Column(
+                children: [
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: Colors.brown,
+                    ),
+                    child: Text("streets"),
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: Colors.brown,
+                    ),
+                    child: Text("satellite"),
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: Colors.brown,
+                    ),
+                    child: Text("outdoor"),
+                  )
+                ],
+              ),
             ),
             Positioned(
               bottom: 0,
               child: Container(
-                height: 200,
-                color: Colors.blue,
+                height: hideBottomPart ? 80 : 220,
+                color: Theme.of(context).primaryColor,
                 width: MediaQuery.of(context).size.width,
                 child: Column(
                   children: [
-                    Text(distance.toString()),
-                    chartData.isNotEmpty
+                    Row(
+                      children: [
+                        Container(
+                          child: Column(
+                            children: [
+                              Text("Total:"),
+                              Text(
+                                distance.toStringAsFixed(2) + "km",
+                              ),
+                            ],
+                          ),
+                          width: MediaQuery.of(context).size.width / 2 - 10,
+                        ),
+                        GestureDetector(
+                          child: hideBottomPart
+                              ? Icon(FontAwesomeIcons.arrowUp)
+                              : Icon(FontAwesomeIcons.arrowDown),
+                          onTap: () => {
+                            setState(() {
+                              hideBottomPart = !hideBottomPart;
+                            })
+                          },
+                        ),
+                        Container(
+                          child: Column(
+                            children: [
+                              Text("Trip distance:"),
+                              Text("1km"),
+                            ],
+                          ),
+                          width: MediaQuery.of(context).size.width / 2 - 20,
+                        )
+                      ],
+                    ),
+                    chartData.isNotEmpty && !hideBottomPart
                         ? Container(
                             width: MediaQuery.of(context).size.width,
-                            height: 180,
+                            height: 170,
                             child: SfCartesianChart(
                               zoomPanBehavior: _zoomPanBehavior,
                               tooltipBehavior: _tooltipBehavior,
@@ -396,6 +456,12 @@ class _MaplibreOfflineRegionMapState extends State<MaplibreOfflineRegionMap> {
                                 autoScrollingDelta: 5,
                                 interval: 10,
                                 autoScrollingMode: AutoScrollingMode.end,
+                                visibleMinimum: 0,
+                                labelStyle: TextStyle(
+                                  color: Colors.black,
+                                ),
+                                visibleMaximum:
+                                    chartData.isNotEmpty ? distance : 2,
                                 interactiveTooltip: const InteractiveTooltip(
                                     // Displays the x-axis tooltip
                                     enable: true,
@@ -405,18 +471,22 @@ class _MaplibreOfflineRegionMapState extends State<MaplibreOfflineRegionMap> {
                               primaryYAxis: NumericAxis(
                                 // minimum: 0.0,
                                 //maximum: 100.0,
+                                labelStyle: TextStyle(
+                                  color: Colors.black,
+                                ),
                                 decimalPlaces: 0,
                                 labelAlignment: LabelAlignment.center,
                               ),
                               series: <ChartSeries>[
                                 // Renders spline chart
                                 //Use SplineAreaSeries if you want to color area below spline
-                                SplineSeries<ChartData, double>(
+                                SplineAreaSeries<ChartData, double>(
                                     onRendererCreated:
                                         (ChartSeriesController controller) {
                                       _chartSeriesController = controller;
                                     },
-                                    //color - provide color for area
+                                    color:
+                                        const Color.fromARGB(255, 34, 132, 37),
                                     dataSource: chartData,
                                     //enableTooltip: true,
                                     splineType: SplineType.natural,
