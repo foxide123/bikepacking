@@ -1,4 +1,5 @@
 import 'package:bikepacking/config/routes/routes.dart';
+import 'package:bikepacking/config/themes/main_theme.dart';
 import 'package:bikepacking/core/dependency_injection/dependency_injection.dart' as di;
 import 'package:bikepacking/core/dependency_injection/google_maps_dependency_injection.dart';
 import 'package:bikepacking/core/dependency_injection/maplibre_dependency_injection.dart' as osmDI;
@@ -43,7 +44,7 @@ class MainApp extends StatefulWidget {
 class _MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(routerConfig: router);
+    return MaterialApp.router(routerConfig: router, theme: mainTheme);
   }
 }
 

@@ -21,11 +21,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    final state = context.read<StravaBloc>().state;
-    if (state is AccessTokenRetrieved) {
-      token = state.token;
-      getProfile();
-    }
     super.initState();
   }
 
@@ -33,26 +28,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return BlocListener<StravaBloc, StravaState>(
       listener: (context, state) {
-        if (state is AccessTokenRetrieved) {
-          getProfile();
-          print("STATE.TOKEN ${state.token}");
-          setState(() {
-            token = state.token;
-          });
-        }
-        if (state is ProfileRetrieved) {
-          getRoutes(state.athlete.id!);
-          print("ID in home_page ${state.athlete.id}");
-          setState(() {
-            athleteId = state.athlete.id!;
-            athlete = state.athlete;
-          });
-        }
-        if (state is RoutesRetrieved) {
-          setState(() {
-            routes = state.routes;
-          });
-        }
       },
       child: Scaffold(
           body: Column(
@@ -66,9 +41,12 @@ class _HomePageState extends State<HomePage> {
                           image: AssetImage('assets/wallpaper.png'),
                           fit: BoxFit.fitWidth)),
                 ),
-                Positioned(top: 50,
-                 left: 80, 
-                child: Image.asset('assets/logo.png'), height: 180,)
+                Positioned(
+                  top: 50,
+                  left: 80,
+                  child: Image.asset('assets/logo.png'),
+                  height: 180,
+                )
               ],
             ),
           ),
@@ -97,10 +75,9 @@ class _HomePageState extends State<HomePage> {
                               ),
                               child: Column(
                                 children: [
-                                  Text(""),
-                                  // Text("AUTHENTICATE"),
                                   Image.asset("assets/map_retro.png",
-                                      height: 150)
+                                      height: 120),
+                                  Text("Downloaded Maps"),
                                 ],
                               ),
                             ),
@@ -118,86 +95,95 @@ class _HomePageState extends State<HomePage> {
                             ),
                             onTap: ()=>authenticate(context),
                           ),*/
-                          
+
                           GestureDetector(
                             child: Container(
                               width: MediaQuery.of(context).size.width / 2,
                               height: 175,
-                              decoration:
-                                  BoxDecoration( gradient: LinearGradient(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
                                   colors: [
                                     Color(0x00BA704F), // ARGB with 0% opacity
                                     Color(0xff975a28), // ARGB with 100% opacity
                                   ],
-                                ),),
+                                ),
+                              ),
                               child: Column(
                                 children: [
-                                  Text(""),
-                                  // Text("bikepacking"),
-                                  //Text("maplibre"),
                                   Image.asset("assets/bikepacking.png",
-                                      height: 150)
-                                  //Image.asset('assets/map_retro.png', height: 150),
+                                      height: 130),
+                                  SizedBox(height: 10),
+                                  Text("Bikepacking",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge),
                                 ],
                               ),
                             ),
-
-                            onTap: ()=>GoRouter.of(context).push("/bikepackingPage"),
+                            onTap: () =>
+                                GoRouter.of(context).push("/bikepackingPage"),
                           ),
                         ],
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          
                           GestureDetector(
                             child: Container(
                                 width: MediaQuery.of(context).size.width / 2,
                                 height: 175,
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Color(0x00E48F45), 
-                                    Color(0xffE48F45), 
-                                  ],
-                                ),
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Color(0x00E48F45),
+                                      Color(0xffE48F45),
+                                    ],
+                                  ),
                                 ),
                                 child: Column(
                                   children: [
-                                    Text(""),
-                                    //  Text("GPX FILES"),
                                     Image.asset('assets/files_retro.png',
-                                        height: 140),
+                                        height: 120),
+                                    SizedBox(height: 10),
+                                    Text("Gpx files",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge)
                                   ],
                                 )),
                             onTap: () =>
                                 GoRouter.of(context).push("/deviceGpxFiles"),
                           ),
-                          
                           GestureDetector(
                             child: Container(
                                 width: MediaQuery.of(context).size.width / 2,
                                 height: 175,
-                                decoration:
-                                    BoxDecoration(gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Color(0x00F5CCA0), 
-                                    Color(0xffF5CCA0), 
-                                  ],
-                                ),),
+                                decoration: const BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Color(0x00F5CCA0),
+                                      Color.fromARGB(255, 209, 153, 93),
+                                      // Color(0xffF5CCA0),
+                                    ],
+                                  ),
+                                ),
                                 child: Column(
                                   children: [
-                                    Text(""),
-                                    // Text("Google maps to gpx"),
                                     Image.asset(
                                         'assets/google_maps_converter.png',
-                                        height: 140),
+                                        height: 120),
+                                    Text(
+                                      "Google Maps to GPX",
+                                      style:
+                                          Theme.of(context).textTheme.bodyLarge,
+                                      textAlign: TextAlign.center,
+                                    )
                                   ],
                                 )),
                             onTap: () => GoRouter.of(context)

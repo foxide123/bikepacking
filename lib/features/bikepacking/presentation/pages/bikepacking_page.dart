@@ -9,17 +9,18 @@ class BikepackingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       //backgroundColor: Color(0x00BA704F),
-      backgroundColor: Color(0xff975a28),
+      backgroundColor: Theme.of(context).primaryColor,
+      appBar: AppBar(),
       body: Column(
         children: [
-          SizedBox(height: 100),
+          SizedBox(height: 20),
           Row(
             children: [
              GestureDetector(
                 child: Container(
                   width: MediaQuery.of(context).size.width / 2,
                   height: 200,
-                  decoration: const BoxDecoration(
+                /*  decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
@@ -28,7 +29,7 @@ class BikepackingPage extends StatelessWidget {
                         Color(0xff975a28),
                       ],
                     ),
-                  ),
+                  ),*/
                   child: Column(
                     children: [
                       Image.asset("assets/bikepacking_list.png", height: 150),
@@ -46,7 +47,7 @@ class BikepackingPage extends StatelessWidget {
                 child: Container(
                   width: MediaQuery.of(context).size.width / 2,
                   height: 200,
-                  decoration: const BoxDecoration(
+                  /*decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
@@ -55,7 +56,7 @@ class BikepackingPage extends StatelessWidget {
                         Color(0xff975a28),
                       ],
                     ),
-                  ),
+                  ),*/
                   child: Column(
                     children: [
                       Image.asset("assets/first_aid_kit.png", height: 150),
@@ -76,9 +77,9 @@ class BikepackingPage extends StatelessWidget {
                 child: Container(
                   width: MediaQuery.of(context).size.width / 2,
                   height: 200,
-                  decoration: const BoxDecoration(
-                    color: Color(0xff975a28)
-                  ),
+                 // decoration: const BoxDecoration(
+                  //  color: Color(0xff975a28)
+                 // ),
                   child: Column(
                     children: [
                       Image.asset("assets/currency_converter.png", height: 150),
@@ -96,9 +97,9 @@ class BikepackingPage extends StatelessWidget {
                 child: Container(
                   width: MediaQuery.of(context).size.width / 2,
                   height: 200,
-                  decoration: const BoxDecoration(
-                   color: Color(0xff975a28)
-                  ),
+                 // decoration: const BoxDecoration(
+                 //  color: Color(0xff975a28)
+                //  ),
                   child: Column(
                     children: [
                       Image.asset("assets/bikepacking_list.png", height: 150),
@@ -120,7 +121,7 @@ class BikepackingPage extends StatelessWidget {
                     child: Container(
                       width: MediaQuery.of(context).size.width / 2,
                       height: 200,
-                      decoration: const BoxDecoration(
+                     /* decoration: const BoxDecoration(
                          gradient: LinearGradient(
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
@@ -129,7 +130,7 @@ class BikepackingPage extends StatelessWidget {
                         Color(0xff975a28),
                       ],
                     ),
-                      ),
+                      ),*/
                       child: Column(
                         children: [
                           Image.asset("assets/journal.png", height: 150),
@@ -146,7 +147,7 @@ class BikepackingPage extends StatelessWidget {
                 child: Container(
                   width: MediaQuery.of(context).size.width / 2,
                   height: 200,
-                  decoration: const BoxDecoration(
+                  /*decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
@@ -155,7 +156,7 @@ class BikepackingPage extends StatelessWidget {
                         Color(0xff975a28),
                       ],
                     ),
-                  ),
+                  ),*/
                   child: Column(
                     children: [
                       Image.asset("assets/location.png", height: 150),

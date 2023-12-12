@@ -48,7 +48,7 @@ class _BikepackingListPageState extends State<BikepackingListPage> {
     ];
 
     return Scaffold(
-      backgroundColor: Color(0xff975a28),
+      backgroundColor: Theme.of(context).primaryColor,
       appBar: AppBar(),
       body: SingleChildScrollView(
         child: Column(
