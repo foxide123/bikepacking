@@ -1,4 +1,4 @@
-import 'package:bikepacking/core/coordinates_to_gpx.dart';
+import 'package:bikepacking/core/gpx/coordinates_to_gpx.dart';
 import 'package:bikepacking/features/google_maps/domain/entities/routing_dto.dart';
 import 'package:bikepacking/features/google_maps/presentation/bloc/bloc/google_maps_bloc.dart';
 import 'package:flutter/material.dart';

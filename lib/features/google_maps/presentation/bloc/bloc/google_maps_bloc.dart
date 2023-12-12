@@ -19,11 +19,12 @@ class GoogleMapsBloc extends Bloc<GoogleMapsEvent, GoogleMapsState> {
     GetRouting event,
     Emitter<GoogleMapsState> emit,
   ) async {
-    final response = await googleMapsLogic.getRouting(event.startLat, event.startLon, event.endLat, event.endLon);
+    final response = await googleMapsLogic.getRouting(
+        event.startLat, event.startLon, event.endLat, event.endLon);
     response.fold(
-      ifLeft: (value) => print(value),
-      ifRight: (listOfCoordinates) => emit(RoutingRetrieved(listOfCoordinates))
-    );
+        ifLeft: (value) => print(value),
+        ifRight: (listOfCoordinates) =>
+            emit(RoutingRetrieved(listOfCoordinates)));
   }
 
   void _onGetElevation(
@@ -32,7 +33,11 @@ class GoogleMapsBloc extends Bloc<GoogleMapsEvent, GoogleMapsState> {
   ) async {
     final response = await googleMapsLogic.getElevation(event.encodedPolylines);
     response.fold(
-      ifLeft: (value)=>print(value),
-      ifRight: (listOfElevation)=> emit(ElevationRetrieved(listOfElevation)));
+      ifLeft: (value) => print(value),
+      ifRight: (listOfElevation) => {
+        emit(ElevationRetrieved(listOfElevation)),
+        print("ElevationRetrieved state called")
+      },
+    );
   }
 }

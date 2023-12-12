@@ -31,18 +31,18 @@ class GoogleMapsRemoteDataSource {
           }).toList());
         }
       }
-    } 
+    }
     return Left(NotFoundFailure(message: "Error when getting routing", statusCode: response.statusCode));
   }
 
   Future<Either<Failure, List<ElevationDAO>>> getElevation(String encodedPolyline) async{
     print("encodedPolyline: $encodedPolyline");
     List<ElevationDAO> elevationList = [];
-       final response = await http.post(Uri.parse(
+    final response = await http.post(Uri.parse(
         "https://maps.googleapis.com/maps/api/elevation/json?locations=enc:$encodedPolyline&key=AIzaSyCIm0RKajmy5avqFn0q40e1oVyd1P5LdlY"));
-      
-      try{
-        if(response.statusCode == 200){
+
+    try{
+      if(response.statusCode == 200){
         final data = json.decode(response.body);
         final results = data['results'];
         print("Results: $results");
@@ -54,9 +54,9 @@ class GoogleMapsRemoteDataSource {
       }else{
         return Left(NotFoundFailure(message: response.body, statusCode: response.statusCode));
       }
-      }catch(e){
-        return Left(RetrievingFailure(message: e.toString(), statusCode: 500));
-      }
+    }catch(e){
+      return Left(RetrievingFailure(message: e.toString(), statusCode: 500));
+    }
     if(elevationList.isNotEmpty){
       return Right(elevationList);
     }else{

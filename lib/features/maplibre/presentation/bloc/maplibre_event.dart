@@ -13,6 +13,7 @@ class DownloadOfflineMap extends MaplibreEvent {
   final double minLon;
   final double maxLon;
   final String routeName;
+  final String mapType;
 
   const DownloadOfflineMap({
     required this.minLat,
@@ -20,5 +21,6 @@ class DownloadOfflineMap extends MaplibreEvent {
     required this.minLon,
     required this.maxLon,
     required this.routeName,
+    required this.mapType,
   });
 }

@@ -20,7 +20,7 @@ class MaplibreBloc extends Bloc<MaplibreEvent, MaplibreState> {
       print("In _onDownloadOfflineMap");
       emit(DownloadInProgressState());
       int regionId = await maplibreLogic.downloadOfflineMap(event.minLat,
-          event.maxLat, event.minLon, event.maxLon, event.routeName);
+          event.maxLat, event.minLon, event.maxLon, event.routeName, event.mapType);
       emit(DownloadSuccessState(regionId));
       print("regionId: $regionId");
     } catch (error) {
