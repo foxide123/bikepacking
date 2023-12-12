@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:bikepacking/core/max_min_extract.dart';
+import 'package:bikepacking/core/gpx/max_min_extract.dart';
 import 'package:bikepacking/features/maplibre/domain/entities/offline_region_list_item.dart';
 import 'package:bikepacking/features/maplibre/presentation/bloc/maplibre_bloc.dart';
 import 'package:bikepacking/features/maplibre/presentation/bloc/maplibre_event.dart';
@@ -127,7 +127,8 @@ class _StravaOfflineMapDownloadPageState
             maxLat: coordinates['maxLat']!,
             minLon: coordinates['minLon']!,
             maxLon: coordinates['maxLon']!,
-            routeName: widget.routeName),
+            routeName: widget.routeName,
+            mapType: "outdoor"),
       );
     }
     else{

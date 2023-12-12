@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:bikepacking/core/errors/failure.dart';
 import 'package:bikepacking/core/strava_local_notifications.dart';
 import 'package:bikepacking/features/strava/domain/enities/route.dart';
 import 'package:bikepacking/features/strava/domain/repository/i_strava_repository.dart';
+import 'package:dart_either/dart_either.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -62,7 +64,7 @@ class StravaLogic {
     }
   }
 
-  getRoutes(int id) async {
+  Future<Either<Failure, List<RouteClass>>> getRoutes(int id) async {
     if (await _repository.getExpirationDate() != "" &&
         await _repository.getExpirationDate() != null) {
       DateTime currentDateTime = DateTime.now();
@@ -73,14 +75,13 @@ class StravaLogic {
         if (profile.id == 0) {
           _repository.authenticate();
         }
-        return await _repository.getRoutes(profile.id);
+        return _repository.getRoutes(profile.id);
       } else {
-        final routes = await _repository.getRoutes(id);
-        return routes;
+        return _repository.getRoutes(id);
       }
     } else {
       _repository.authenticate();
-      return [];
+      return Left(RetrievingFailure(message: "Failure retrieving routes. Expiration Date null", statusCode: 500));
     }
   }
 

@@ -1,9 +1,11 @@
 import 'dart:convert';
 
+import 'package:bikepacking/core/errors/failure.dart';
 import 'package:bikepacking/core/security/strava_credentials.dart';
 import 'package:bikepacking/features/strava/data/models/athlete_model.dart';
 import 'package:bikepacking/features/strava/data/models/route_model.dart';
 import 'package:bikepacking/features/strava/domain/enities/athlete.dart';
+import 'package:dart_either/dart_either.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -55,7 +57,7 @@ class StravaRemoteDataSource {
     }
   }
 
-  getRoutes(int id, String token) async {
+  Future<Either<Failure, List<RouteModel>>> getRoutes(int id, String token) async {
     final response = await client.get(
       Uri.https("www.strava.com", "/api/v3/athletes/$id/routes"),
       headers: {
@@ -64,13 +66,13 @@ class StravaRemoteDataSource {
     );
     if(response.statusCode == 200 || response.statusCode == 202){
       final responseList = jsonDecode(response.body);
-      final routeList = [];
+      List<RouteModel> routeList = [];
       for(Map<String, dynamic> route in responseList){
         routeList.add(RouteModel.fromJson(route));
       }
-      return routeList;
+      return Right(routeList);
     }else{
-      print("ERROR: ${response.body}");
+      return Left(RetrievingFailure(message: "Failure getting routes from strava ${response.statusCode}", statusCode: 500));
     }
   }
 

@@ -28,7 +28,7 @@ class ProfileRetrieved extends StravaState{
 }
 
 class RoutesRetrieved extends StravaState{
-  final List<dynamic> routes;
+  final List<RouteClass> routes;
 
   const RoutesRetrieved(this.routes);
 

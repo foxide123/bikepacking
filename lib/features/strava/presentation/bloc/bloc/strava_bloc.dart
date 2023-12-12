@@ -1,3 +1,4 @@
+import 'package:bikepacking/features/strava/data/models/route_model.dart';
 import 'package:bikepacking/features/strava/domain/enities/athlete.dart';
 import 'package:bikepacking/features/strava/domain/enities/route.dart';
 import 'package:bikepacking/features/strava/domain/usecases/strava_logic.dart';
@@ -57,9 +58,14 @@ class StravaBloc extends Bloc<StravaEvent, StravaState> {
     Emitter<StravaState> emit,
   )async{
     final routes = await stravaLogic.getRoutes(event.athleteId);
-    if(routes != [] || routes != null){
+    routes.fold(
+      ifLeft: (response){
+        print(response);
+      },
+     ifRight: (routes){
+      print("ROUTES in strava_bloc: $routes");
       emit(RoutesRetrieved(routes));
-    }
+     });
   }
 
   void _onDownloadRoute(

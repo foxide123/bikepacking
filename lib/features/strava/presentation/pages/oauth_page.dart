@@ -50,7 +50,7 @@ class _OAuthPageState extends State<OAuthPage> {
   void popScreen() async {
     await Future.delayed(Duration(seconds: 3));
     if (mounted) {
-      GoRouter.of(context).go("/");
+      GoRouter.of(context).push("deviceGpxFiles");
     }
   }
 }

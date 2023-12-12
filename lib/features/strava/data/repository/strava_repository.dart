@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:bikepacking/core/errors/failure.dart';
 import 'package:bikepacking/features/strava/data/data_sources/strava_local_data_source.dart';
 import 'package:bikepacking/features/strava/data/data_sources/strava_remote_data_source.dart';
+import 'package:bikepacking/features/strava/domain/enities/route.dart';
 import 'package:bikepacking/features/strava/domain/repository/i_strava_repository.dart';
+import 'package:dart_either/dart_either.dart';
 import 'package:http/http.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -51,7 +54,7 @@ class StravaRepository implements IStravaRepository {
   }
 
   @override
-  getRoutes(int id) async{
+  Future<Either<Failure, List<RouteClass>>> getRoutes(int id) async{
     final token = await localDataSource.getAccessToken();
     return remoteDataSource.getRoutes(id, token);
   }
