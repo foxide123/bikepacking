@@ -81,6 +81,7 @@ class _HomePageState extends State<HomePage> {
                                 ],
                               ),
                             ),
+                            onTap: ()=>GoRouter.of(context).push("/maplibreDownloadedMaps"),
                           ),
                           /* GestureDetector(
                             child: Container(

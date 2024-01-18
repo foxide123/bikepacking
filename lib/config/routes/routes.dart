@@ -4,6 +4,7 @@ import 'package:bikepacking/features/bikepacking/presentation/pages/currency_con
 import 'package:bikepacking/features/bikepacking/presentation/pages/location_sharing_page.dart';
 import 'package:bikepacking/features/bikepacking/presentation/pages/notebook_page.dart';
 import 'package:bikepacking/features/bikepacking/presentation/pages/vpn_page.dart';
+import 'package:bikepacking/features/maplibre/presentation/pages/maplibre_downloaded_maps.dart';
 import 'package:bikepacking/features/maplibre/presentation/pages/maplibre_map_page.dart';
 import 'package:bikepacking/features/maplibre/presentation/pages/maplibre_offline_page.dart';
 import 'package:bikepacking/features/maplibre/presentation/pages/maplibre_offline_region_map.dart';
@@ -88,6 +89,12 @@ GoRouter router = GoRouter(initialLocation: "/", routes: <GoRoute>[
             routeName: routeName,
             summaryPolyline: summaryPolyline,
             gpxContent: gpxContent);
+      }),
+
+      GoRoute(
+      path: "/maplibreDownloadedMaps",
+      builder: (BuildContext context, GoRouterState state) {
+        return MaplibreDownloadedMaps();
       }),
   GoRoute(
       path: "/deviceGpxFiles",

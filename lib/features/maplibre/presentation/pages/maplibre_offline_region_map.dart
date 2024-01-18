@@ -368,40 +368,6 @@ class _MaplibreOfflineRegionMapState extends State<MaplibreOfflineRegionMap> {
               ],
             ),
             Positioned(
-              top: 20,
-              right: 10,
-              child: Column(
-                children: [
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      color: Colors.brown,
-                    ),
-                    child: Text("streets"),
-                  ),
-                  SizedBox(height: 10),
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      color: Colors.brown,
-                    ),
-                    child: Text("satellite"),
-                  ),
-                  SizedBox(height: 10),
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      color: Colors.brown,
-                    ),
-                    child: Text("outdoor"),
-                  )
-                ],
-              ),
-            ),
-            Positioned(
               bottom: 0,
               child: Container(
                 height: hideBottomPart ? 80 : 220,
